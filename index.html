@@ -3,23 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tarjetas de dilemas — Condicional simple</title>
+<title>Torneo de temporales — Subjuntivo presente</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #F5F2EB;
-    --surface: #FFFDF7;
-    --accent: #C84B2F;
-    --accent-light: #F5E8E3;
-    --text: #1A1714;
-    --muted: #7A7470;
-    --border: #DDD8CE;
-    --tag-dinero-bg: #FEF3DC; --tag-dinero: #7A4A0A;
-    --tag-social-bg: #E8EAF8; --tag-social: #3A3D8F;
-    --tag-futuro-bg: #DFF2EB; --tag-futuro: #0F5E40;
-    --tag-dilema-bg: #FDECEA; --tag-dilema: #8B2515;
+    --bg: #F0F4F8;
+    --surface: #FFFFFF;
+    --border: #DDE3EA;
+    --text: #1A1D21;
+    --muted: #6B7280;
+    --hint: #9CA3AF;
+    --a: #185FA5;
+    --a-light: #E6F1FB;
+    --a-border: #B5D4F4;
+    --a-dark: #0C447C;
+    --b: #993C1D;
+    --b-light: #FAECE7;
+    --b-border: #F5C4B3;
+    --b-dark: #712B13;
+    --connector-bg: #EEEDFE;
+    --connector-text: #3C3489;
+    --green: #1D9E75;
+    --amber: #BA7517;
+    --red: #E24B4A;
   }
 
   body {
@@ -31,187 +39,263 @@
   }
 
   header {
-    max-width: 900px;
-    margin: 0 auto 2.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    max-width: 780px;
+    margin: 0 auto 2rem;
   }
 
   header h1 {
     font-family: 'Fraunces', serif;
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
     font-weight: 600;
-    color: var(--text);
     line-height: 1.15;
   }
 
-  header h1 span { color: var(--accent); }
+  header h1 span { color: var(--a); }
+  header p { font-size: 14px; color: var(--muted); margin-top: 5px; }
 
-  header p {
-    font-size: 14px;
-    color: var(--muted);
-  }
+  .arena { max-width: 780px; margin: 0 auto; }
 
-  .controls {
-    max-width: 900px;
-    margin: 0 auto 1.5rem;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .filter-btn {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    padding: 6px 16px;
-    border-radius: 999px;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.18s;
-    font-weight: 500;
-  }
-
-  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-  .grid {
-    max-width: 900px;
-    margin: 0 auto;
+  .scoreboard {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 14px;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 1.5rem;
   }
 
-  .card-wrap {
-    perspective: 900px;
-    height: 200px;
-  }
-
-  .card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.45s cubic-bezier(.4,0,.2,1);
-    cursor: pointer;
-  }
-
-  .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
-
-  .card-front, .card-back {
-    position: absolute;
-    inset: 0;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+  .team-card {
     background: var(--surface);
     border: 1.5px solid var(--border);
     border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: border-color 0.18s, box-shadow 0.18s;
+    padding: 16px 20px;
+    text-align: center;
+    transition: border-color 0.3s;
   }
 
-  .card-wrap:hover .card-front,
-  .card-wrap:hover .card-back {
-    border-color: #C5BFB4;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+  .team-card.leading-a { border-color: var(--a-border); }
+  .team-card.leading-b { border-color: var(--b-border); }
+
+  .team-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+
+  .team-score {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1;
   }
 
-  .card-back { transform: rotateY(180deg); }
+  .team-score.a { color: var(--a); }
+  .team-score.b { color: var(--b); }
+  .vs { font-size: 13px; color: var(--hint); font-weight: 500; text-align: center; }
 
-  .tag {
-    font-size: 10.5px;
-    font-weight: 500;
-    padding: 3px 10px;
-    border-radius: 999px;
-    align-self: flex-start;
-    letter-spacing: 0.03em;
+  .challenge-box {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .round-label {
+    font-size: 11px;
+    color: var(--hint);
     text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 12px;
   }
 
-  .tag-dinero { background: var(--tag-dinero-bg); color: var(--tag-dinero); }
-  .tag-social { background: var(--tag-social-bg); color: var(--tag-social); }
-  .tag-futuro { background: var(--tag-futuro-bg); color: var(--tag-futuro); }
-  .tag-dilema { background: var(--tag-dilema-bg); color: var(--tag-dilema); }
-
-  .situation {
+  .connector-badge {
+    display: inline-block;
     font-size: 14px;
     font-weight: 500;
-    color: var(--text);
-    line-height: 1.45;
-    flex: 1;
+    padding: 5px 16px;
+    border-radius: 999px;
+    background: var(--connector-bg);
+    color: var(--connector-text);
+    margin-bottom: 16px;
   }
 
-  .flip-hint {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: right;
-    margin-top: auto;
-  }
-
-  .question {
-    font-family: 'Fraunces', serif;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--accent);
-    line-height: 1.35;
-  }
-
-  .hint-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-  }
-
-  .hint-text {
-    font-size: 12.5px;
+  .situation {
+    font-size: 16px;
+    font-weight: 500;
     color: var(--text);
     line-height: 1.5;
-    flex: 1;
+    margin-bottom: 8px;
   }
 
-  .card-wrap.hidden { display: none; }
+  .prompt-text {
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.5;
+  }
 
-  footer {
-    max-width: 900px;
-    margin: 2.5rem auto 0;
+  .example-row {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1.5px solid var(--border);
   }
 
-  .btn {
+  .example-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--hint);
+    white-space: nowrap;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .example-text {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.55;
+    cursor: pointer;
+    transition: filter 0.25s;
+  }
+
+  .example-text.blurred { filter: blur(5px); user-select: none; }
+  .example-text.blurred:hover { filter: blur(3px); }
+
+  .timer-wrap { margin-bottom: 0.25rem; }
+
+  .timer-bar-bg {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .timer-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.1s linear, background 0.3s;
+  }
+
+  .timer-label {
+    font-size: 12px;
+    color: var(--hint);
+    text-align: right;
+    margin-top: 4px;
+    margin-bottom: 1rem;
+  }
+
+  .point-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .btn-a {
+    background: var(--a-light);
+    border: 1.5px solid var(--a-border);
+    color: var(--a-dark);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-a:hover { background: var(--a-border); }
+
+  .btn-b {
+    background: var(--b-light);
+    border: 1.5px solid var(--b-border);
+    color: var(--b-dark);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-b:hover { background: var(--b-border); }
+
+  .controls-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-neutral {
     font-family: 'DM Sans', sans-serif;
     font-size: 13px;
-    padding: 8px 18px;
+    padding: 8px 16px;
     border-radius: 8px;
     border: 1.5px solid var(--border);
     background: var(--surface);
     color: var(--text);
     cursor: pointer;
     font-weight: 500;
-    transition: all 0.18s;
+    transition: background 0.15s;
   }
 
-  .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-neutral:hover { background: var(--bg); }
+
+  .log {
+    border-top: 1.5px solid var(--border);
+    padding-top: 1rem;
+  }
+
+  .log-title {
+    font-size: 11px;
+    color: var(--hint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+
+  .log-entry {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .log-entry:last-child { border-bottom: none; }
+  .dot-a { color: var(--a); font-weight: 500; }
+  .dot-b { color: var(--b); font-weight: 500; }
+
+  .finish-box {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    display: none;
+  }
+
+  .finish-box.show { display: block; }
+
+  .finish-title {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .finish-sub { font-size: 15px; color: var(--muted); margin-bottom: 2rem; }
 
   .instructions {
-    max-width: 900px;
-    margin: 0 auto 2rem;
     background: var(--surface);
     border: 1.5px solid var(--border);
     border-radius: 12px;
     padding: 14px 18px;
     font-size: 13px;
     color: var(--muted);
-    line-height: 1.6;
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
   }
 
   .instructions strong { color: var(--text); }
@@ -220,110 +304,219 @@
 <body>
 
 <header>
-  <h1>Tarjetas de <span>dilemas</span></h1>
-  <p>Condicional simple — nivel B1 · 16 situaciones</p>
+  <h1>Torneo de <span>temporales</span></h1>
+  <p>Subjuntivo presente · conector + frase completa · nivel B1</p>
 </header>
 
-<div class="instructions">
-  <strong>Cómo usar:</strong> Haz clic en una carta para ver la pregunta y las estructuras útiles. Filtra por tema o mézclalo todo. Trabaja en parejas o en grupo.
+<div class="arena">
+
+  <div class="instructions">
+    <strong>Cómo jugar:</strong> Aparece una situación con un conector temporal. Las dos equipos tienen 45 segundos para construir una frase completa y correcta. El/la profe valida y asigna el punto. ¡El ejemplo está oculto — tócalo solo al final!
+  </div>
+
+  <div class="scoreboard">
+    <div class="team-card" id="card-a">
+      <div class="team-name" id="name-a">Equipo A</div>
+      <div class="team-score a" id="score-a">0</div>
+    </div>
+    <div class="vs">vs</div>
+    <div class="team-card" id="card-b">
+      <div class="team-name" id="name-b">Equipo B</div>
+      <div class="team-score b" id="score-b">0</div>
+    </div>
+  </div>
+
+  <div id="game-area">
+    <div class="challenge-box">
+      <div class="round-label" id="round-label">Turno 1 de 10</div>
+      <div class="connector-badge" id="connector-badge">cuando</div>
+      <p class="situation" id="situation-text"></p>
+      <p class="prompt-text" id="prompt-text"></p>
+      <div class="example-row">
+        <span class="example-label">Ejemplo</span>
+        <span class="example-text blurred" id="example-text" onclick="revealExample()">Toca para revelar el ejemplo modelo</span>
+      </div>
+    </div>
+
+    <div class="timer-wrap">
+      <div class="timer-bar-bg"><div class="timer-bar" id="timer-bar"></div></div>
+      <div class="timer-label" id="timer-label">45 s</div>
+    </div>
+
+    <div class="point-grid">
+      <button class="btn-a" onclick="addPoint('a')">+1 punto — <span id="name-a-btn">Equipo A</span></button>
+      <button class="btn-b" onclick="addPoint('b')">+1 punto — <span id="name-b-btn">Equipo B</span></button>
+    </div>
+
+    <div class="controls-row">
+      <button class="btn-neutral" onclick="nextChallenge()">Siguiente reto →</button>
+      <button class="btn-neutral" onclick="resetTimer()">↺ Reiniciar timer</button>
+      <button class="btn-neutral" onclick="setupNames()">✏ Cambiar nombres</button>
+      <button class="btn-neutral" onclick="restartGame()">↺ Nueva partida</button>
+    </div>
+
+    <div class="log">
+      <div class="log-title">Historial de puntos</div>
+      <div id="log-entries"></div>
+    </div>
+  </div>
+
+  <div class="finish-box" id="finish-box">
+    <div class="finish-title" id="finish-title"></div>
+    <div class="finish-sub" id="finish-sub"></div>
+    <button class="btn-neutral" onclick="restartGame()">Jugar otra vez</button>
+  </div>
+
 </div>
-
-<div class="controls" id="controls">
-  <button class="filter-btn active" data-filter="all" onclick="filter('all', this)">Todas (16)</button>
-  <button class="filter-btn" data-filter="dinero" onclick="filter('dinero', this)">💰 Dinero</button>
-  <button class="filter-btn" data-filter="social" onclick="filter('social', this)">👥 Relaciones</button>
-  <button class="filter-btn" data-filter="futuro" onclick="filter('futuro', this)">🔮 Futuro</button>
-  <button class="filter-btn" data-filter="dilema" onclick="filter('dilema', this)">⚖️ Dilemas éticos</button>
-</div>
-
-<div class="grid" id="grid"></div>
-
-<footer>
-  <button class="btn" onclick="shuffleCards()">🔀 Mescola le carte</button>
-  <button class="btn" onclick="flipAll()">↩ Gira tutte</button>
-  <button class="btn" onclick="resetAll()">↺ Ricomincia</button>
-</footer>
 
 <script>
-const cards = [
-  { tag: 'dinero', tagLabel: 'Dinero', situation: 'Encuentras 500 € en la calle. No hay nadie cerca.', question: '¿Qué harías?', hint: 'Yo lo llevaría a la policía… / me lo quedaría porque… / lo donaría a…' },
-  { tag: 'dinero', tagLabel: 'Dinero', situation: 'Tu mejor amigo te pide 200 € prestados. Sabes que no te los devolvería nunca.', question: '¿Se los darías? ¿Cómo se lo dirías?', hint: 'Le daría / no le daría el dinero porque… / le diría que…' },
-  { tag: 'dinero', tagLabel: 'Dinero', situation: 'Ganas 1.000.000 € en la lotería. Mañana tienes que decidir qué hacer.', question: '¿Cómo gastarías o invertirías el dinero?', hint: 'Compraría… / viajaría a… / donaría una parte a… / lo guardaría en…' },
-  { tag: 'dinero', tagLabel: 'Dinero', situation: 'En el supermercado el cajero te devuelve de más por error. Son 30 €.', question: '¿Se lo dirías o te irías?', hint: 'Se lo diría porque… / me iría porque… / dependería de…' },
-  { tag: 'social', tagLabel: 'Relaciones', situation: 'Descubres que tu mejor amigo/a te está mintiendo sobre algo importante.', question: '¿Cómo reaccionarías? ¿Se lo dirías?', hint: 'Le preguntaría directamente… / fingiría que no sé nada… / hablaría con…' },
-  { tag: 'social', tagLabel: 'Relaciones', situation: 'Tu profe favorito/a está a punto de cometer un error delante de toda la clase.', question: '¿Lo corregirías? ¿Cómo?', hint: 'Levantaría la mano y diría… / esperaría al final… / no diría nada porque…' },
-  { tag: 'social', tagLabel: 'Relaciones', situation: 'Ves en redes sociales que unos compañeros organizan una fiesta sin invitarte.', question: '¿Qué sentirías y qué harías?', hint: 'Me sentiría… / les preguntaría por qué… / no diría nada y…' },
-  { tag: 'social', tagLabel: 'Relaciones', situation: 'Tu grupo de amigos quiere hacer algo que tú crees que está mal.', question: '¿Les seguirías la corriente o dirías algo?', hint: 'Iría igualmente porque… / les diría que… / me iría sin explicaciones…' },
-  { tag: 'futuro', tagLabel: 'Futuro', situation: 'Te ofrecen vivir un año entero en otro país, completamente gratis.', question: '¿Irías? ¿A dónde? ¿Por qué?', hint: 'Iría a… porque… / no iría porque… / dependería de…' },
-  { tag: 'futuro', tagLabel: 'Futuro', situation: 'Puedes elegir: ser famoso/a o ser muy rico/a, pero solo una cosa.', question: '¿Cuál elegirías y por qué?', hint: 'Elegiría… porque… / lo más importante para mí sería…' },
-  { tag: 'futuro', tagLabel: 'Futuro', situation: 'Una empresa te ofrece un trabajo increíble… pero en otra ciudad muy lejos de tu familia.', question: '¿Lo aceptarías? ¿Con qué condiciones?', hint: 'Lo aceptaría si… / no podría irme porque… / hablaría primero con…' },
-  { tag: 'futuro', tagLabel: 'Futuro', situation: 'Puedes viajar al pasado o al futuro, pero solo una vez y sin volver atrás.', question: '¿Adónde irías? ¿Qué harías allí?', hint: 'Iría a… y vería / cambiaría… / hablaría con…' },
-  { tag: 'dilema', tagLabel: 'Dilemas éticos', situation: 'Ves que alguien hace trampa en un examen importante. Es un/a amigo/a tuyo/a.', question: '¿Se lo dirías al profe? ¿Le dirías algo a él/ella?', hint: 'Se lo diría al profe porque… / no diría nada pero… / dependería de…' },
-  { tag: 'dilema', tagLabel: 'Dilemas éticos', situation: 'Puedes salvar a 5 personas desconocidas o a 1 persona que conoces bien.', question: '¿Qué harías? ¿Importa quién es esa persona?', hint: 'Salvaría a… porque… / dependería de quién es… / no podría decidir porque…' },
-  { tag: 'dilema', tagLabel: 'Dilemas éticos', situation: 'Sabes algo que podría perjudicar a alguien, pero contarlo dañaría a otra persona.', question: '¿Hablarías o te callarías?', hint: 'Lo contaría si… / me callaría porque… / buscaría otra solución como…' },
-  { tag: 'dilema', tagLabel: 'Dilemas éticos', situation: 'Tienes la oportunidad de hacer algo ilegal que no daña a nadie pero te ayudaría mucho.', question: '¿Lo harías? ¿Cambia algo el hecho de que sea ilegal?', hint: 'Lo haría porque… / no lo haría aunque… / dependería de si…' },
+const challenges = [
+  { connector: 'cuando', situation: 'Estás esperando el resultado de un examen importante.', prompt: 'Completa: "Cuando sepa la nota, yo…"', example: 'Cuando sepa la nota, llamaré a mis padres para contársela.' },
+  { connector: 'en cuanto', situation: 'Has terminado todos los deberes. Quieres salir con tus amigos.', prompt: 'Completa: "En cuanto termine los deberes, yo…"', example: 'En cuanto termine los deberes, saldré a ver a mis amigos.' },
+  { connector: 'hasta que', situation: 'Estás aprendiendo a conducir. Todavía no eres muy bueno/a.', prompt: 'Completa: "No podré ir solo/a en coche hasta que…"', example: 'No podré ir solo/a en coche hasta que apruebe el examen de conducir.' },
+  { connector: 'antes de que', situation: 'Mañana tienes una presentación oral en clase. Quieres practicar.', prompt: 'Completa: "Quiero practicar antes de que…"', example: 'Quiero practicar antes de que llegue el momento de hablar delante de todos.' },
+  { connector: 'cuando', situation: 'Tu grupo de amigos está planeando las vacaciones de verano.', prompt: 'Completa: "Cuando lleguen las vacaciones, nosotros…"', example: 'Cuando lleguen las vacaciones, iremos todos juntos a la playa.' },
+  { connector: 'en cuanto', situation: 'Llevas semanas ahorrando para comprarte algo especial.', prompt: 'Completa: "En cuanto tenga suficiente dinero, yo…"', example: 'En cuanto tenga suficiente dinero, me compraré las zapatillas que quiero.' },
+  { connector: 'hasta que', situation: 'Tienes un conflicto con un amigo/a. Quieres resolverlo.', prompt: 'Completa: "No me quedaré tranquilo/a hasta que…"', example: 'No me quedaré tranquilo/a hasta que hablemos y lo solucionemos.' },
+  { connector: 'cuando', situation: 'Acabas de terminar el instituto. ¿Qué harás después?', prompt: 'Completa: "Cuando acabe el instituto, yo…"', example: 'Cuando acabe el instituto, me iré a vivir a otra ciudad para estudiar.' },
+  { connector: 'antes de que', situation: 'Hay una fiesta el viernes pero tus padres aún no lo saben.', prompt: 'Completa: "Tengo que hablar con mis padres antes de que…"', example: 'Tengo que hablar con mis padres antes de que se enteren por otra persona.' },
+  { connector: 'en cuanto', situation: 'Llevas dos semanas sin ver a tu mejor amigo/a porque estaba de viaje.', prompt: 'Completa: "En cuanto vuelva, nosotros…"', example: 'En cuanto vuelva, quedaremos para contarnos todo lo que ha pasado.' },
 ];
 
-let order = [...Array(cards.length).keys()];
-let activeFilter = 'all';
+let scores = { a: 0, b: 0 };
+let current = 0;
+let shuffled = [];
+let timer = null;
+let timeLeft = 45;
+let nameA = 'Equipo A';
+let nameB = 'Equipo B';
 
-function render() {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-  order.forEach(i => {
-    const c = cards[i];
-    const show = activeFilter === 'all' || c.tag === activeFilter;
-    const wrap = document.createElement('div');
-    wrap.className = 'card-wrap' + (show ? '' : ' hidden');
-    wrap.dataset.tag = c.tag;
-    wrap.innerHTML = `
-      <div class="card-inner">
-        <div class="card-front">
-          <span class="tag tag-${c.tag}">${c.tagLabel}</span>
-          <p class="situation">${c.situation}</p>
-          <p class="flip-hint">toca para ver ↩</p>
-        </div>
-        <div class="card-back">
-          <span class="tag tag-${c.tag}">${c.tagLabel}</span>
-          <p class="question">${c.question}</p>
-          <p class="hint-label">estructuras útiles</p>
-          <p class="hint-text">${c.hint}</p>
-        </div>
-      </div>`;
-    wrap.addEventListener('click', () => wrap.classList.toggle('flipped'));
-    grid.appendChild(wrap);
-  });
-}
-
-function filter(tag, btn) {
-  activeFilter = tag;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.card-wrap').forEach(card => {
-    if (tag === 'all' || card.dataset.tag === tag) card.classList.remove('hidden');
-    else card.classList.add('hidden');
-  });
-}
-
-function shuffleCards() {
-  for (let i = order.length - 1; i > 0; i--) {
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [order[i], order[j]] = [order[j], order[i]];
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  render();
-  const activeBtn = document.querySelector(`.filter-btn[data-filter="${activeFilter}"]`);
-  if (activeBtn) filter(activeFilter, activeBtn);
+  return a;
 }
 
-function flipAll() {
-  document.querySelectorAll('.card-wrap:not(.hidden)').forEach(c => c.classList.add('flipped'));
+function setupNames() {
+  const a = prompt('Nome Equipo A:', nameA);
+  const b = prompt('Nome Equipo B:', nameB);
+  if (a && a.trim()) nameA = a.trim();
+  if (b && b.trim()) nameB = b.trim();
+  updateNames();
 }
 
-function resetAll() {
-  document.querySelectorAll('.card-wrap').forEach(c => c.classList.remove('flipped'));
+function updateNames() {
+  document.getElementById('name-a').textContent = nameA;
+  document.getElementById('name-b').textContent = nameB;
+  document.getElementById('name-a-btn').textContent = nameA;
+  document.getElementById('name-b-btn').textContent = nameB;
 }
 
-render();
+function renderChallenge() {
+  if (current >= shuffled.length) { endGame(); return; }
+  const c = shuffled[current];
+  document.getElementById('round-label').textContent = 'Turno ' + (current + 1) + ' de ' + shuffled.length;
+  document.getElementById('connector-badge').textContent = c.connector;
+  document.getElementById('situation-text').textContent = c.situation;
+  document.getElementById('prompt-text').textContent = c.prompt;
+  const ex = document.getElementById('example-text');
+  ex.textContent = c.example;
+  ex.className = 'example-text blurred';
+  resetTimer();
+}
+
+function revealExample() {
+  document.getElementById('example-text').className = 'example-text';
+}
+
+function addPoint(team) {
+  scores[team]++;
+  document.getElementById('score-' + team).textContent = scores[team];
+  updateLeading();
+  const c = shuffled[current] || {};
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  const teamName = team === 'a' ? nameA : nameB;
+  const cls = 'dot-' + team;
+  entry.innerHTML = '<span class="' + cls + '">' + teamName + '</span> · ronda ' + (current + 1) + ' · <em>' + (c.connector || '') + '</em>';
+  document.getElementById('log-entries').prepend(entry);
+  nextChallenge();
+}
+
+function updateLeading() {
+  const ca = document.getElementById('card-a');
+  const cb = document.getElementById('card-b');
+  ca.className = 'team-card';
+  cb.className = 'team-card';
+  if (scores.a > scores.b) ca.className = 'team-card leading-a';
+  else if (scores.b > scores.a) cb.className = 'team-card leading-b';
+}
+
+function nextChallenge() {
+  current++;
+  if (current >= shuffled.length) { endGame(); return; }
+  renderChallenge();
+}
+
+function resetTimer() {
+  clearInterval(timer);
+  timeLeft = 45;
+  updateTimerUI();
+  timer = setInterval(function() {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft <= 0) clearInterval(timer);
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const pct = Math.max(0, (timeLeft / 45) * 100);
+  const bar = document.getElementById('timer-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = timeLeft > 15 ? '#1D9E75' : timeLeft > 7 ? '#BA7517' : '#E24B4A';
+  document.getElementById('timer-label').textContent = Math.max(0, timeLeft) + ' s';
+}
+
+function endGame() {
+  clearInterval(timer);
+  document.getElementById('game-area').style.display = 'none';
+  const fb = document.getElementById('finish-box');
+  fb.classList.add('show');
+  let title, sub;
+  if (scores.a > scores.b) {
+    title = '¡Gana ' + nameA + '!';
+    sub = scores.a + ' – ' + scores.b + ' · ¡enhorabuena!';
+  } else if (scores.b > scores.a) {
+    title = '¡Gana ' + nameB + '!';
+    sub = scores.b + ' – ' + scores.a + ' · ¡enhorabuena!';
+  } else {
+    title = '¡Empate!';
+    sub = scores.a + ' – ' + scores.b + ' · ¡los dos equipos lo hicieron muy bien!';
+  }
+  document.getElementById('finish-title').textContent = title;
+  document.getElementById('finish-sub').textContent = sub;
+}
+
+function restartGame() {
+  clearInterval(timer);
+  scores = { a: 0, b: 0 };
+  current = 0;
+  document.getElementById('score-a').textContent = '0';
+  document.getElementById('score-b').textContent = '0';
+  document.getElementById('log-entries').innerHTML = '';
+  document.getElementById('finish-box').classList.remove('show');
+  document.getElementById('game-area').style.display = 'block';
+  document.getElementById('card-a').className = 'team-card';
+  document.getElementById('card-b').className = 'team-card';
+  shuffled = shuffle(challenges);
+  renderChallenge();
+}
+
+shuffled = shuffle(challenges);
+renderChallenge();
 </script>
 </body>
 </html>
