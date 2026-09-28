@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarjetas de dilemas — Condicional simple</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F2EB;
+    --surface: #FFFDF7;
+    --accent: #C84B2F;
+    --accent-light: #F5E8E3;
+    --text: #1A1714;
+    --muted: #7A7470;
+    --border: #DDD8CE;
+    --tag-dinero-bg: #FEF3DC; --tag-dinero: #7A4A0A;
+    --tag-social-bg: #E8EAF8; --tag-social: #3A3D8F;
+    --tag-futuro-bg: #DFF2EB; --tag-futuro: #0F5E40;
+    --tag-dilema-bg: #FDECEA; --tag-dilema: #8B2515;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  header {
+    max-width: 900px;
+    margin: 0 auto 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.15;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  header p {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .controls {
+    max-width: 900px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-weight: 500;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .card-wrap {
+    perspective: 900px;
+    height: 200px;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(.4,0,.2,1);
+    cursor: pointer;
+  }
+
+  .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+
+  .card-front, .card-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+
+  .card-wrap:hover .card-front,
+  .card-wrap:hover .card-back {
+    border-color: #C5BFB4;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+  }
+
+  .card-back { transform: rotateY(180deg); }
+
+  .tag {
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+    align-self: flex-start;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .tag-dinero { background: var(--tag-dinero-bg); color: var(--tag-dinero); }
+  .tag-social { background: var(--tag-social-bg); color: var(--tag-social); }
+  .tag-futuro { background: var(--tag-futuro-bg); color: var(--tag-futuro); }
+  .tag-dilema { background: var(--tag-dilema-bg); color: var(--tag-dilema); }
+
+  .situation {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.45;
+    flex: 1;
+  }
+
+  .flip-hint {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: auto;
+  }
+
+  .question {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1.35;
+  }
+
+  .hint-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .hint-text {
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .card-wrap.hidden { display: none; }
+
+  footer {
+    max-width: 900px;
+    margin: 2.5rem auto 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.18s;
+  }
+
+  .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .instructions {
+    max-width: 900px;
+    margin: 0 auto 2rem;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .instructions strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tarjetas de <span>dilemas</span></h1>
+  <p>Condicional simple — nivel B1 · 16 situaciones</p>
+</header>
+
+<div class="instructions">
+  <strong>Cómo usar:</strong> Haz clic en una carta para ver la pregunta y las estructuras útiles. Filtra por tema o mézclalo todo. Trabaja en parejas o en grupo.
+</div>
+
+<div class="controls" id="controls">
+  <button class="filter-btn active" data-filter="all" onclick="filter('all', this)">Todas (16)</button>
+  <button class="filter-btn" data-filter="dinero" onclick="filter('dinero', this)">💰 Dinero</button>
+  <button class="filter-btn" data-filter="social" onclick="filter('social', this)">👥 Relaciones</button>
+  <button class="filter-btn" data-filter="futuro" onclick="filter('futuro', this)">🔮 Futuro</button>
+  <button class="filter-btn" data-filter="dilema" onclick="filter('dilema', this)">⚖️ Dilemas éticos</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<footer>
+  <button class="btn" onclick="shuffleCards()">🔀 Mescola le carte</button>
+  <button class="btn" onclick="flipAll()">↩ Gira tutte</button>
+  <button class="btn" onclick="resetAll()">↺ Ricomincia</button>
+</footer>
+
+<script>
+const cards = [
+  { tag: 'dinero', tagLabel: 'Dinero', situation: 'Encuentras 500 € en la calle. No hay nadie cerca.', question: '¿Qué harías?', hint: 'Yo lo llevaría a la policía… / me lo quedaría porque… / lo donaría a…' },
+  { tag: 'dinero', tagLabel: 'Dinero', situation: 'Tu mejor amigo te pide 200 € prestados. Sabes que no te los devolvería nunca.', question: '¿Se los darías? ¿Cómo se lo dirías?', hint: 'Le daría / no le daría el dinero porque… / le diría que…' },
+  { tag: 'dinero', tagLabel: 'Dinero', situation: 'Ganas 1.000.000 € en la lotería. Mañana tienes que decidir qué hacer.', question: '¿Cómo gastarías o invertirías el dinero?', hint: 'Compraría… / viajaría a… / donaría una parte a… / lo guardaría en…' },
+  { tag: 'dinero', tagLabel: 'Dinero', situation: 'En el supermercado el cajero te devuelve de más por error. Son 30 €.', question: '¿Se lo dirías o te irías?', hint: 'Se lo diría porque… / me iría porque… / dependería de…' },
+  { tag: 'social', tagLabel: 'Relaciones', situation: 'Descubres que tu mejor amigo/a te está mintiendo sobre algo importante.', question: '¿Cómo reaccionarías? ¿Se lo dirías?', hint: 'Le preguntaría directamente… / fingiría que no sé nada… / hablaría con…' },
+  { tag: 'social', tagLabel: 'Relaciones', situation: 'Tu profe favorito/a está a punto de cometer un error delante de toda la clase.', question: '¿Lo corregirías? ¿Cómo?', hint: 'Levantaría la mano y diría… / esperaría al final… / no diría nada porque…' },
+  { tag: 'social', tagLabel: 'Relaciones', situation: 'Ves en redes sociales que unos compañeros organizan una fiesta sin invitarte.', question: '¿Qué sentirías y qué harías?', hint: 'Me sentiría… / les preguntaría por qué… / no diría nada y…' },
+  { tag: 'social', tagLabel: 'Relaciones', situation: 'Tu grupo de amigos quiere hacer algo que tú crees que está mal.', question: '¿Les seguirías la corriente o dirías algo?', hint: 'Iría igualmente porque… / les diría que… / me iría sin explicaciones…' },
+  { tag: 'futuro', tagLabel: 'Futuro', situation: 'Te ofrecen vivir un año entero en otro país, completamente gratis.', question: '¿Irías? ¿A dónde? ¿Por qué?', hint: 'Iría a… porque… / no iría porque… / dependería de…' },
+  { tag: 'futuro', tagLabel: 'Futuro', situation: 'Puedes elegir: ser famoso/a o ser muy rico/a, pero solo una cosa.', question: '¿Cuál elegirías y por qué?', hint: 'Elegiría… porque… / lo más importante para mí sería…' },
+  { tag: 'futuro', tagLabel: 'Futuro', situation: 'Una empresa te ofrece un trabajo increíble… pero en otra ciudad muy lejos de tu familia.', question: '¿Lo aceptarías? ¿Con qué condiciones?', hint: 'Lo aceptaría si… / no podría irme porque… / hablaría primero con…' },
+  { tag: 'futuro', tagLabel: 'Futuro', situation: 'Puedes viajar al pasado o al futuro, pero solo una vez y sin volver atrás.', question: '¿Adónde irías? ¿Qué harías allí?', hint: 'Iría a… y vería / cambiaría… / hablaría con…' },
+  { tag: 'dilema', tagLabel: 'Dilemas éticos', situation: 'Ves que alguien hace trampa en un examen importante. Es un/a amigo/a tuyo/a.', question: '¿Se lo dirías al profe? ¿Le dirías algo a él/ella?', hint: 'Se lo diría al profe porque… / no diría nada pero… / dependería de…' },
+  { tag: 'dilema', tagLabel: 'Dilemas éticos', situation: 'Puedes salvar a 5 personas desconocidas o a 1 persona que conoces bien.', question: '¿Qué harías? ¿Importa quién es esa persona?', hint: 'Salvaría a… porque… / dependería de quién es… / no podría decidir porque…' },
+  { tag: 'dilema', tagLabel: 'Dilemas éticos', situation: 'Sabes algo que podría perjudicar a alguien, pero contarlo dañaría a otra persona.', question: '¿Hablarías o te callarías?', hint: 'Lo contaría si… / me callaría porque… / buscaría otra solución como…' },
+  { tag: 'dilema', tagLabel: 'Dilemas éticos', situation: 'Tienes la oportunidad de hacer algo ilegal que no daña a nadie pero te ayudaría mucho.', question: '¿Lo harías? ¿Cambia algo el hecho de que sea ilegal?', hint: 'Lo haría porque… / no lo haría aunque… / dependería de si…' },
+];
+
+let order = [...Array(cards.length).keys()];
+let activeFilter = 'all';
+
+function render() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  order.forEach(i => {
+    const c = cards[i];
+    const show = activeFilter === 'all' || c.tag === activeFilter;
+    const wrap = document.createElement('div');
+    wrap.className = 'card-wrap' + (show ? '' : ' hidden');
+    wrap.dataset.tag = c.tag;
+    wrap.innerHTML = `
+      <div class="card-inner">
+        <div class="card-front">
+          <span class="tag tag-${c.tag}">${c.tagLabel}</span>
+          <p class="situation">${c.situation}</p>
+          <p class="flip-hint">toca para ver ↩</p>
+        </div>
+        <div class="card-back">
+          <span class="tag tag-${c.tag}">${c.tagLabel}</span>
+          <p class="question">${c.question}</p>
+          <p class="hint-label">estructuras útiles</p>
+          <p class="hint-text">${c.hint}</p>
+        </div>
+      </div>`;
+    wrap.addEventListener('click', () => wrap.classList.toggle('flipped'));
+    grid.appendChild(wrap);
+  });
+}
+
+function filter(tag, btn) {
+  activeFilter = tag;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.card-wrap').forEach(card => {
+    if (tag === 'all' || card.dataset.tag === tag) card.classList.remove('hidden');
+    else card.classList.add('hidden');
+  });
+}
+
+function shuffleCards() {
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  render();
+  const activeBtn = document.querySelector(`.filter-btn[data-filter="${activeFilter}"]`);
+  if (activeBtn) filter(activeFilter, activeBtn);
+}
+
+function flipAll() {
+  document.querySelectorAll('.card-wrap:not(.hidden)').forEach(c => c.classList.add('flipped'));
+}
+
+function resetAll() {
+  document.querySelectorAll('.card-wrap').forEach(c => c.classList.remove('flipped'));
+}
+
+render();
+</script>
+</body>
+</html>
